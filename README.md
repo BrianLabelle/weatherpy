@@ -1,37 +1,43 @@
-## Welcome to GitHub Pages
 
-You can use the [editor on GitHub](https://github.com/BrianLabelle/weatherpy/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+Data Analytics - Boot Camp - Homework #6 - What's the Weather Like? | Data Analysis
+# Unit 5 | Assignment - What's the Weather Like
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+![banner](images/2019banner.jpg)
 
-### Markdown
+### Background
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Whether financial, political, or social -- data's true power lies in its ability to answer questions definitively. So let's take what you've learned about Python requests, APIs, and JSON traversals to answer a fundamental question: "What's the weather like as we approach the equator?"
 
-```markdown
-Syntax highlighted code block
+Now, we know what you may be thinking: "Duh. It gets hotter..."
 
-# Header 1
-## Header 2
-### Header 3
+But, if pressed, how would you prove it?
 
-- Bulleted
-- List
+# WeatherPy
 
-1. Numbered
-2. List
+In this example, you'll be creating a Python script to visualize the weather of 500+ cities across the world of varying distance from the equator. To accomplish this, you'll be utilizing a simple Python library, the OpenWeatherMap API, and a little common sense to create a representative model of weather across world cities.
 
-**Bold** and _Italic_ and `Code` text
+Your objective is to build a series of scatter plots to showcase the following relationships:
 
-[Link](url) and ![Image](src)
-```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+* Temperature (F) vs. Latitude
+* Humidity (%) vs. Latitude
+* Cloudiness (%) vs. Latitude
+* Wind Speed (mph) vs. Latitude
 
-### Jekyll Themes
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/BrianLabelle/weatherpy/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+## Your final notebook must:
 
-### Support or Contact
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+* Randomly select at least 500 unique (non-repeat) cities based on latitude and longitude.
+* Perform a weather check on each of the cities using a series of successive API calls.
+* Include a print log of each city as it's being processed with the city number and city name.
+* Save both a CSV of all data retrieved and png images for each scatter plot.
+
+
+### As final considerations:
+
+* You must complete your analysis using a Jupyter notebook.
+* You must use the Matplotlib or Pandas plotting libraries.
+* You must include a written description of three observable trends based on the data.
+* You must use proper labeling of your plots, including aspects like: Plot Titles (with date of analysis) and Axes Labels.
+
