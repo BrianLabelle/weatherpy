@@ -1,8 +1,8 @@
 
 Data Analytics - Boot Camp - Homework #6 - What's the Weather Like? | Data Analysis
-# Unit 5 | Assignment - What's the Weather Like
+# Unit 6 | Assignment - What's the Weather Like
 
-![banner](images/2019banner.jpg)
+![banner](rice-cookers-hw-weatherpy.jpg)
 
 ### Background
 
