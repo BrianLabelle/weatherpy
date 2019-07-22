@@ -1,0 +1,347 @@
+#CELL #1
+# reference: started 2019-07-21 @ 2:30. Finished at 2019-07-21 @ 10pm.
+# reference links
+# http://localhost:8888/notebooks/006-Python-APIs/2/Activities/09-Ins_OpenWeatherWrapper/Solved/Ins_OpenWeatherWrapper.ipynb
+# http://localhost:8888/notebooks/006-Python-APIs/2/Activities/13-Ins_CitiPy/Solved/Ins_CitiPy_Demo.ipynb
+
+
+# Dependencies and Setup
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import requests
+import time
+import json
+
+import openweathermapy.core as owm
+from datetime import datetime
+from datetime import date
+
+# Import API key
+from api_keys import api_key
+from config import gkey
+
+# Incorporated citipy to determine city based on latitude and longitude
+from citipy import citipy
+
+# Output File (CSV)
+output_data_file = "cities.csv"
+
+# Range of latitudes and longitudes
+lat_range = (-90, 90)
+lng_range = (-180, 180)
+
+# Create settings dictionary with information we're interested in
+settings = {"units": "imperial", "appid": api_key}
+================================================================================
+
+#CELL #2.
+# List for holding lat_lngs and cities
+lat_lngs = []
+cities = []
+
+# Create a set of random lat and lng combinations
+lats = np.random.uniform(low=-90.000, high=90.000, size=1500)
+lngs = np.random.uniform(low=-180.000, high=180.000, size=1500)
+lat_lngs = zip(lats, lngs)
+
+# Identify nearest city for each lat, lng combination
+for lat_lng in lat_lngs:
+    city = citipy.nearest_city(lat_lng[0], lat_lng[1]).city_name
+    
+    # If the city is unique, then add it to a our cities list
+    if city not in cities:
+        cities.append(city)
+
+# Print the city count to confirm sufficient count
+len(cities)
+================================================================================
+
+#CELL #3.
+current_weather_city = owm.get_current(city, **settings)
+print(f"Current weather object for {city}: {current_weather_city}.")
+
+summary = ["name","sys.country","coord.lon","coord.lat", "main.temp_max","main.humidity","wind.speed","wind.deg",]
+
+data = current_weather_city(*summary)
+print(f"The current weather summary is: {data}.")
+#type(summary) # list
+#type(data) #tuple
+
+
+# API URL
+#url = "api.openweathermap.org/data/2.5/weather?q={city_url}&APPID={api_key}"
+#url = "api.openweathermap.org/data/2.5/weather?q={city_url}&APPID={api_key}"
+#url = "api.openweathermap.org/data/2.5/weather?q={city_url}&APPID=49e2f46ab1f5fac6cb95a031d61a5c7e"
+url = "api.openweathermap.org/data/2.5/weather?q="+city
+current_weather_city = owm.get_current(city, **settings)
+print(f"Current weather object for {city}: {current_weather_city}.")
+
+summary = ["name","id","coord.lon","coord.lat", "main.temp_max","main.humidity","wind.speed","wind.deg",]
+
+data = current_weather_city(*summary)
+print(f"The current weather summary is: {data}.")
+#type(summary) # list
+#type(data) #tuple
+print(data)
+len(cities)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# Cell #4 : PERFORM API CALLS...
+url = "api.openweathermap.org/data/2.5/weather?q="+city
+current_weather_city = owm.get_current(city, **settings)
+summary = ["name","id","coord.lon","coord.lat", "main.temp_max","main.humidity","wind.speed","wind.deg",]
+data = current_weather_city(*summary)
+
+
+# https://stackoverflow.com/questions/31175223/append-a-tuple-to-a-list-whats-the-difference-between-two-ways
+# https://stackoverflow.com/questions/16730339/python-add-item-to-the-tuple
+# https://realpython.com/python-exceptions/
+
+#cheating to setup dataframe to export to csv
+df_wp =pd.DataFrame(columns = [
+    "City","Country","City ID","Date","Longitude","Lattitude","Max Temp", "Humidity", "Wind Speed", "Cloudiness"])
+
+
+set_counter = 1      # counter for sets for display purposes.
+record_counter = 1   # counter for record counts for display purposes
+index_counter = 0    # index counter per record to populate dataframe
+block_counter = 0    # counter of 50 records per set
+
+# set is len(cities) / 50
+set_total = round(len(cities)/50,0)
+set_total
+
+#url = "api.openweathermap.org/data/2.5/"
+#url = "api.openweathermap.org/data/2.5/weather?q="+city
+# Print Header Requirement
+print(f"Beginning Data Retrieval")
+print(f"-------------------------------")
+
+
+# loop through the cities 
+
+for city in cities:
+
+    try:
+        # My Order: summary = ["name","sys.country","dt","coord.lon","coord.lat", "main.temp_max","main.humidity","wind.speed","clouds.all"]
+        
+        # URL Address should not contain any spaces.
+        city_url = city.replace(" ", "%20")
+             
+        print(f"Processing Record {record_counter} of Set {set_counter} | City ID Number: {id} | City Name: {city.title()} ")
+        #print(f'{api.openweathermap.org/data/2.5/weather?q="+{city_url}+"&APPID="+{api_key}}')
+        #print(current_weather_city)
+        #print(f'{owm.BASE_URL}weather?q={city_url}&units=imperial&APPID={api_key}')
+        current_weather_city = owm.get_current(city, **settings)
+        
+        # mapping API data to dataframe
+        df_wp.set_value(index_counter, "City", current_weather_city("name"))
+            
+        df_wp.set_value(index_counter, "Country", current_weather_city("sys.country"))
+        df_wp.set_value(index_counter, "City ID", current_weather_city("id"))
+        df_wp.set_value(index_counter, "Date", current_weather_city("dt"))
+        df_wp.set_value(index_counter, "Longitude", current_weather_city("coord.lon"))
+        df_wp.set_value(index_counter, "Lattitude", current_weather_city("coord.lat"))
+        df_wp.set_value(index_counter, "Max Temp", current_weather_city("main.temp_max"))
+        df_wp.set_value(index_counter, "Humidity", current_weather_city("main.humidity"))
+        df_wp.set_value(index_counter, "Wind Speed", current_weather_city("wind.speed"))
+        df_wp.set_value(index_counter, "Cloudiness", current_weather_city("clouds.all"))       
+        
+        # Increase Counters
+        index_counter = index_counter + 1 # index counter starts at 0
+        
+    except:
+        print("City not found. Skipping...")
+        #print(current_weather_city)
+        #print(f'{owm.BASE_URL}weather?q={city_url}&units=imperial&APPID={api_key}'    
+    record_counter = record_counter + 1 # record counter starts at 1 for display purposes
+    block_counter = block_counter + 1
+    
+    if block_counter ==50: # loop goes to 50 records per set. increate set counter by 1.
+        block_counter = 1 # reset block counter for next set of 50.
+        set_counter = set_counter + 1 
+        
+        
+        
+# Print Footer Requirement
+print(f"-------------------------------")
+print(f"Data Retrieval Complete")
+print(f"-------------------------------")
+
+=============================================================================================
+
+#CELL 5. Convert Raw Data to DataFrame
+
+# Reference Link: https://datatofish.com/export-dataframe-to-csv/
+
+export_csv = df_wp.to_csv (output_data_file, encoding='utf-8', index=False, header=True)
+
+# have put in my own sort column order, more logical by "grouping". Parameters at the end versus alphabetical.
+df_wp.head()
+
+
+=============================================================================================
+
+#CELL 6. Latitude vs. Temperature Plot
+
+# Build a scatter plot for each data type
+# https://matplotlib.org/2.0.2/examples/color/named_colors.html
+plt.scatter(df_wp["Lattitude"], df_wp["Max Temp"], c=["steelblue"],marker="o", s=50, alpha=0.75, edgecolors="black")
+
+# Incorporate the other graph properties
+plt.title(f"City Latitude vs. Max Temperature ( {date.today()} )")
+plt.ylabel("Max. Temperature (F)")
+plt.xlabel("Latitude")
+plt.ylim(5, 105)
+plt.grid(True)
+
+# Save the figure
+plt.savefig("2019-BJL-WeatherPy-lat-vs-temp.jpg", dpi=None, facecolor='w', edgecolor='w',
+        orientation='portrait', papertype=None, format=None,
+        transparent=False, bbox_inches='tight', pad_inches=0.1,
+        frameon=None, metadata=None)
+
+# Show plot
+plt.show()
+
+
+
+
+=============================================================================================
+
+#CELL 7. Latitude vs. Humidity Plot
+
+# Build a scatter plot for each data type
+# https://matplotlib.org/2.0.2/examples/color/named_colors.html
+plt.scatter(df_wp["Lattitude"], df_wp["Humidity"], c=["steelblue"],marker="o", s=50, alpha=0.75, edgecolors="black")
+
+# Incorporate the other graph properties
+plt.title(f"City Latitude vs. Humidity ( {date.today()} )")
+plt.ylabel("Humidity ( % )")
+plt.xlabel("Latitude")
+plt.ylim(5, 105)
+plt.xlim(-62,85)
+plt.grid(True)
+
+# Save the figure
+plt.savefig("2019-BJL-WeatherPy-lat-vs-hum.jpg", dpi=None, facecolor='w', edgecolor='w',
+        orientation='portrait', papertype=None, format=None,
+        transparent=False, bbox_inches='tight', pad_inches=0.1,
+        frameon=None, metadata=None)
+
+# Show plot
+plt.show()
+
+
+=============================================================================================
+
+#CELL 8. Latitude vs. Cloudiness Plot
+
+
+# Build a scatter plot for each data type
+# https://matplotlib.org/2.0.2/examples/color/named_colors.html
+plt.scatter(df_wp["Lattitude"], df_wp["Cloudiness"], c=["steelblue"],marker="o", s=50, alpha=0.75, edgecolors="black")
+
+# Incorporate the other graph properties
+plt.title(f"City Latitude vs. Cloudiness ( {date.today()} )")
+plt.ylabel("Cloudiness ( % )")
+plt.xlabel("Latitude")
+plt.ylim(5, 105)
+plt.xlim(-62,85)
+plt.grid(True)
+
+# Save the figure
+plt.savefig("2019-BJL-WeatherPy-lat-vs-cloud.jpg", dpi=None, facecolor='w', edgecolor='w',
+        orientation='portrait', papertype=None, format=None,
+        transparent=False, bbox_inches='tight', pad_inches=0.1,
+        frameon=None, metadata=None)
+
+# Show plot
+plt.show()
+
+
+
+
+
+
+
+
+
+
+=============================================================================================
+
+#CELL 9. Latitude vs. Wind Speed Plot
+
+# Build a scatter plot for each data type
+# https://matplotlib.org/2.0.2/examples/color/named_colors.html
+plt.scatter(df_wp["Lattitude"], df_wp["Wind Speed"], c=["steelblue"],marker="o", s=50, alpha=0.75, edgecolors="black")
+
+# Incorporate the other graph properties
+plt.title(f"City Latitude vs. Wind Speed ( {date.today()} )")
+plt.ylabel("Wind Speed ( mph )")
+plt.xlabel("Latitude")
+plt.ylim(-1, 34)
+plt.xlim(-61,85)
+plt.grid(True)
+
+# Save the figure
+plt.savefig("2019-BJL-WeatherPy-lat-vs-win.jpg", dpi=None, facecolor='w', edgecolor='w',
+        orientation='portrait', papertype=None, format=None,
+        transparent=False, bbox_inches='tight', pad_inches=0.1,
+        frameon=None, metadata=None)
+
+# Show plot
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
